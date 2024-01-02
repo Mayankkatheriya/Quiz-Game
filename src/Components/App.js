@@ -9,31 +9,33 @@ function App() {
       {difficulty ? (
         <LandingPage level={difficulty} />
       ) : (
-        <div className="container text-center mt-5">
-          <h1>Welcome to the Quiz</h1>
-          <p className="level">Choose a level of difficulty below:</p>
-          <div className="level-btn-box">
-            <button
-              type="button"
-              className="level-btn"
-              onClick={() => setDifficulty("easy")}
-            >
-              Easy
-            </button>
-            <button
-              type="button"
-              className="level-btn"
-              onClick={() => setDifficulty("medium")}
-            >
-              Medium
-            </button>
-            <button
-              type="button"
-              className="level-btn"
-              onClick={() => setDifficulty("hard")}
-            >
-              Hard
-            </button>
+        <div className="starting-page">
+          <div className="start-content">
+            <h1>Welcome to the Quiz</h1>
+            <p className="level">Choose a level of difficulty below:</p>
+            <div className="level-btn-box">
+              <button
+                type="button"
+                className="level-btn"
+                onClick={() => setDifficulty("easy")}
+              >
+                Easy
+              </button>
+              <button
+                type="button"
+                className="level-btn"
+                onClick={() => setDifficulty("medium")}
+              >
+                Medium
+              </button>
+              <button
+                type="button"
+                className="level-btn"
+                onClick={() => setDifficulty("hard")}
+              >
+                Hard
+              </button>
+            </div>
           </div>
         </div>
       )}

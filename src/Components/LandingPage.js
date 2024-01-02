@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import loader from "../Assets/loader.gif";
+import wrong from "../Assets/wrong.gif";
 
 const LandingPage = ({ level }) => {
   const [questions, setQuestions] = useState([]);
@@ -8,88 +10,70 @@ const LandingPage = ({ level }) => {
   const [skip, setSkip] = useState(0);
   const [timer, setTimer] = useState(10);
 
+
+  //TODO func to fetch data from API
+  async function fetchData() {
+    try {
+      const response = await fetch(
+        `https://opentdb.com/api.php?amount=10&type=multiple&cate&difficulty=${level}`
+      );
+      const data = await response.json();
+      if (data.response_code === 0) {
+        setLoading(false);
+        setQuestions(data.results);
+      } else {
+        setLoading(false);
+        setQuestions([]);
+      }
+    } catch (error) {
+      console.log("Error", error);
+    }
+  }
+
   useEffect(() => {
     document.title = `Quiz Level ${level.toUpperCase()}`;
-    async function fetchData() {
-      try {
-        const response = await fetch(
-          `https://opentdb.com/api.php?amount=10&type=multiple&cate&difficulty=${level}`
-        );
-        const data = await response.json();
-        if (data.response_code === 0) {
-          setLoading(false);
-          setQuestions(data.results);
-        } else {
-          setLoading(false);
-          setQuestions([]);
-        }
-      } catch (error) {
-        console.log("Error", error);
-      }
-    }
     fetchData();
   }, []);
 
+  // useEffect(() => {
+  //   setTimer(10);
+  // }, [currentQuestion]);
+
+  // useEffect(() => {
+  //   // Set up the timer countdown
+  //   const timerInterval = setInterval(() => {
+  //     setTimer((prevTimer) => prevTimer - 1);
+  //   }, 1000);
+
+  //   // Clear the interval when the component unmounts or the question changes
+  //   return () => clearInterval(timerInterval);
+  // }, [currentQuestion]);
+
+  // useEffect(() => {
+  //   // Check if the timer reaches 0
+  //   if (timer === 0) {
+  //     // Move to the next question when the timer runs out
+  //     handleAnswerClick(null);
+  //   }
+  // }, [timer]);
+
+  //TODO handle click on answer
   const handleAnswerClick = (selectedAnswer) => {
     if (selectedAnswer === questions[currentQuestion].correct_answer) {
       setScore(score + 1);
     }
 
-    // Move to the next question
+    //* Move to the next question
     setCurrentQuestion(currentQuestion + 1);
   };
 
+  //TODO handle to skip question
   const handleSkip = () => {
     setCurrentQuestion(currentQuestion + 1);
     setSkip(skip + 1);
   };
 
-  const renderQuestion = () => {
-    const question = questions[currentQuestion];
-
-    if (!question) {
-      // Quiz completed
-      return (
-        <div className="result">
-          <p>Quiz Completed!</p>
-          <p>
-            Your Score: <span>{score}/10</span>
-          </p>
-          <p>
-            Skipped Questions: <span>{skip}</span>
-          </p>
-          <button className="reset" onClick={() => window.location.reload()}>
-            Reset
-          </button>
-        </div>
-      );
-    }
-
-    // Shuffle the answer options
-    const shuffledAnswers = shuffleArray([
-      ...question.incorrect_answers,
-      question.correct_answer,
-    ]);
-
-    return (
-      <div>
-        <div className="ctg-timer">
-          <h3>{question.category}</h3>
-        </div>
-        <h3>{question.question}</h3>
-        <ul>
-          {shuffledAnswers.map((answer, index) => (
-            <li key={answer} onClick={() => handleAnswerClick(answer)}>
-              <span>{index + 1}.</span> <span>{answer}</span>
-            </li>
-          ))}
-        </ul>
-        <button onClick={handleSkip}>Skip Question</button>
-      </div>
-    );
-  };
-
-  // Helper function to shuffle array elements
+  //TODO Helper function to shuffle array elements
   const shuffleArray = (array) => {
     const shuffledArray = [...array];
     for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -102,18 +86,76 @@ const LandingPage = ({ level }) => {
     return shuffledArray;
   };
 
-  // Rendering data to UI
+  //TODO render according to condition
+  const renderQuestion = () => {
+    const question = questions[currentQuestion];
+
+    if (!question) {
+      // Quiz completed
+      return (
+        <div className="result">
+          <p>Quiz Completed!</p>
+          <p>
+            Your Score: <span>{score}</span>/10
+          </p>
+          <p>
+            Skipped Questions: <span>{skip}</span>
+          </p>
+          <button className="skip-btn" onClick={() => window.location.reload()}>
+            Reset
+          </button>
+        </div>
+      );
+    }
+
+    //* Shuffle the answer options
+    const shuffledAnswers = shuffleArray([
+      ...question.incorrect_answers,
+      question.correct_answer,
+    ]);
+
+    return (
+      <div className="question">
+        <div className="ctg">
+          Category :&nbsp;<span>{question.category}</span>
+        </div>
+        <div className="timer">
+          Time Remaining :&nbsp;<span>{timer}</span>
+        </div>
+        <h3>
+          Q-{currentQuestion + 1}. <span>{question.question}</span>
+        </h3>
+        <ul>
+          {shuffledAnswers.map((answer, index) => (
+            <li key={answer} onClick={() => handleAnswerClick(answer)}>
+              <span>{String.fromCharCode(index + 65)}.</span>{" "}
+              <span>{answer}</span>
+            </li>
+          ))}
+        </ul>
+        <button onClick={handleSkip} className="skip-btn">
+          Skip Question
+        </button>
+      </div>
+    );
+  };
+
+  //TODO Rendering data to UI
   return (
     <div className="landing">
       {isLoading ? (
-        <p>Loading...</p>
-      ) : questions.length === 0 ? (
-        <p>Try Again</p>
-      ) : (
-        <div>
-          <h1>Quiz App</h1>
-          {renderQuestion()}
+        <div className="loading">
+          <img src={loader} alt="" className="loader" />
         </div>
+      ) : questions.length === 0 ? (
+        <div className="loading">
+          <img src={wrong} alt="" className="wrong" />
+          <button onClick={() => window.location.reload()} className="reload">
+            Reload
+          </button>
+        </div>
+      ) : (
+        <div className="questions">{renderQuestion()}</div>
       )}
     </div>
   );
