@@ -9,6 +9,7 @@ const LandingPage = ({ level }) => {
   const [score, setScore] = useState(0);
   const [skip, setSkip] = useState(0);
   const [timer, setTimer] = useState(10);
+  // const [shuffledAnswers, setShuffledAnswers] = useState([]);
 
 
   //TODO func to fetch data from API
@@ -37,6 +38,10 @@ const LandingPage = ({ level }) => {
 
   // useEffect(() => {
   //   setTimer(10);
+  //   // setShuffledAnswers(shuffleArray([
+  //   //   ...questions[currentQuestion].incorrect_answers,
+  //   //   questions[currentQuestion].correct_answer,
+  //   // ]));
   // }, [currentQuestion]);
 
   // useEffect(() => {
@@ -96,10 +101,10 @@ const LandingPage = ({ level }) => {
         <div className="result">
           <p>Quiz Completed!</p>
           <p>
-            Your Score: <span>{score}</span>/10
+            Your Score : <span>{score}</span>/10
           </p>
           <p>
-            Skipped Questions: <span>{skip}</span>
+            Skipped Questions : <span>{skip}</span>
           </p>
           <button className="skip-btn" onClick={() => window.location.reload()}>
             Reset
@@ -108,7 +113,7 @@ const LandingPage = ({ level }) => {
       );
     }
 
-    //* Shuffle the answer options
+    // * Shuffle the answer options
     const shuffledAnswers = shuffleArray([
       ...question.incorrect_answers,
       question.correct_answer,
@@ -117,19 +122,19 @@ const LandingPage = ({ level }) => {
     return (
       <div className="question">
         <div className="ctg">
-          Category :&nbsp;<span>{question.category}</span>
+          {"Category: "}&nbsp;<span>{question.category}</span>
         </div>
-        <div className="timer">
+        {/* <div className="timer">
           Time Remaining :&nbsp;<span>{timer}</span>
-        </div>
+        </div> */}
         <h3>
-          Q-{currentQuestion + 1}. <span>{question.question}</span>
+          Q-{currentQuestion + 1}. <span dangerouslySetInnerHTML={{__html: question.question}}/>
         </h3>
         <ul>
           {shuffledAnswers.map((answer, index) => (
             <li key={answer} onClick={() => handleAnswerClick(answer)}>
               <span>{String.fromCharCode(index + 65)}.</span>{" "}
-              <span>{answer}</span>
+              <span dangerouslySetInnerHTML={{__html: answer}}/>
             </li>
           ))}
         </ul>
