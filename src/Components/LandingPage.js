@@ -8,9 +8,8 @@ const LandingPage = ({ level }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [skip, setSkip] = useState(0);
-  const [timer, setTimer] = useState(10);
-  // const [shuffledAnswers, setShuffledAnswers] = useState([]);
-
+  const [timer, setTimer] = useState(30);
+  const [shuffledAnswers, setShuffledAnswers] = useState([]);
 
   //TODO func to fetch data from API
   async function fetchData() {
@@ -31,36 +30,44 @@ const LandingPage = ({ level }) => {
     }
   }
 
+  //TODO useEffect fir initial fetching data from API
   useEffect(() => {
     document.title = `Quiz Level ${level.toUpperCase()}`;
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   setTimer(10);
-  //   // setShuffledAnswers(shuffleArray([
-  //   //   ...questions[currentQuestion].incorrect_answers,
-  //   //   questions[currentQuestion].correct_answer,
-  //   // ]));
-  // }, [currentQuestion]);
+  //TODO if data fetch successful set answers by suffling for each question and set timer to 30 again
+  useEffect(() => {
+    setTimer(30);
+    const currentQuestionData = questions[currentQuestion];
+    if (currentQuestionData) {
+      const shuffledArray = shuffleArray([
+        ...currentQuestionData.incorrect_answers,
+        currentQuestionData.correct_answer,
+      ]);
+      setShuffledAnswers(shuffledArray);
+    }
+  }, [currentQuestion, questions]);
 
-  // useEffect(() => {
-  //   // Set up the timer countdown
-  //   const timerInterval = setInterval(() => {
-  //     setTimer((prevTimer) => prevTimer - 1);
-  //   }, 1000);
+  //TODO start timer for each new question
+  useEffect(() => {
+    // Set up the timer countdown
+    const timerInterval = setInterval(() => {
+      setTimer((prevTimer) => prevTimer - 1);
+    }, 1000);
 
-  //   // Clear the interval when the component unmounts or the question changes
-  //   return () => clearInterval(timerInterval);
-  // }, [currentQuestion]);
+    // Clear the interval when the component unmounts or the question changes
+    return () => clearInterval(timerInterval);
+  }, [currentQuestion]);
 
-  // useEffect(() => {
-  //   // Check if the timer reaches 0
-  //   if (timer === 0) {
-  //     // Move to the next question when the timer runs out
-  //     handleAnswerClick(null);
-  //   }
-  // }, [timer]);
+  //TODO useEffect with timer dependency, if timer zero handle situation
+  useEffect(() => {
+    // Check if the timer reaches 0
+    if (timer === 0) {
+      // Move to the next question when the timer runs out
+      handleSkip()
+    }
+  }, [timer]);
 
   //TODO handle click on answer
   const handleAnswerClick = (selectedAnswer) => {
@@ -113,28 +120,23 @@ const LandingPage = ({ level }) => {
       );
     }
 
-    // * Shuffle the answer options
-    const shuffledAnswers = shuffleArray([
-      ...question.incorrect_answers,
-      question.correct_answer,
-    ]);
-
     return (
       <div className="question">
         <div className="ctg">
           {"Category: "}&nbsp;<span>{question.category}</span>
         </div>
-        {/* <div className="timer">
+        <div className="timer">
           Time Remaining :&nbsp;<span>{timer}</span>
-        </div> */}
+        </div>
         <h3>
-          Q-{currentQuestion + 1}. <span dangerouslySetInnerHTML={{__html: question.question}}/>
+          Q-{currentQuestion + 1}.{" "}
+          <span dangerouslySetInnerHTML={{ __html: question.question }} />
         </h3>
         <ul>
           {shuffledAnswers.map((answer, index) => (
             <li key={answer} onClick={() => handleAnswerClick(answer)}>
               <span>{String.fromCharCode(index + 65)}.</span>{" "}
-              <span dangerouslySetInnerHTML={{__html: answer}}/>
+              <span dangerouslySetInnerHTML={{ __html: answer }} />
             </li>
           ))}
         </ul>
